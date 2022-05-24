@@ -13,4 +13,4 @@ The aim of this script is to explore which data is stored in the CDM. This can b
 
 5 Run the ro_run file
 
-6 Go to g_output and upload the csv files to DRE
+6 Go to g_output and upload the csv files (1 file per CDM table) to DRE
