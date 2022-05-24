@@ -1,7 +1,8 @@
 # Aim
 The aim of this script is to explore which data is stored in the CDM. This can be compared to the study specific specifications of the study variables.
 
-#Instruction
+# Instruction
+
 1 Open the to_run.R file with Rstudio
 
 2 Fill the variable path with the location of the CDM tables (csv files)
