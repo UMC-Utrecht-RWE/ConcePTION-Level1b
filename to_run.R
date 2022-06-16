@@ -36,7 +36,7 @@ system.time(source(paste0(projectFolder,"/p_steps/functions/IMPORT_PATTERN.R")))
 system.time(source(paste0(projectFolder,"/p_steps/functions/GetColumnNamesCDM.R")))
 
 #Get needed packages
-system.time(source(paste0(projectFolder,"/p_steps/packages.R")))
+system.time(source(paste0(projectFolder,"/packages.R")))
 
 #Get CDM tables and columns
 TABLES <- GetColumnNamesCDM(paste0(projectFolder,"/p_meta/ConcePTION_CDM tables v2.2.xlsx"))
