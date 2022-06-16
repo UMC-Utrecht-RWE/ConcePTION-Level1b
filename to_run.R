@@ -8,12 +8,12 @@
 rm(list=ls())
 gc()
 
-#Fill location of CDM and the table to analyze. There are 2 options. If StudyName is set top NULL a path can be specified. If a studyname is defined the path_to_fill is 
-#replaced by the folder with the StudyName in the folder where the program is located 
+#Fill location of CDM and the table to analyze. There are 2 options. If StudyName is set top NULL a path can be specified. If a StudyName is defined the path_to_fill is 
+#replaced by the folder with the CDMInstances/StudyName in the folder where the program is located 
 
 StudyName <- "RTI_10000_20220511"
 #StudyName <- NULL
-#path_to_fill <- "C:/C4591021_PfizerUMC/CDMInstances/Validate"
+#path_to_fill <- "C:/C4591021_PfizerUMC/CDMInstances/TEST_SAMPLE"
 path_to_fill <- NULL
 
 
@@ -48,6 +48,10 @@ system.time(source(paste0(projectFolder,"/p_steps/functions/GetColumnNamesCDM.R"
 #Get needed packages
 system.time(source(paste0(projectFolder,"/packages.R")))
 
+#Get info from CDM_SOURCE file needed for naming output files
+system.time(source(paste0(projectFolder,"/p_steps/GetInfoOutputFiles.R")))
+
+
 #Get CDM tables and columns
 TABLES <- GetColumnNamesCDM(paste0(projectFolder,"/p_meta/ConcePTION_CDM tables v2.2.xlsx"))
 
@@ -62,11 +66,11 @@ TABLES <- TABLES[Variable ==  "specialty_of_visit_vocabulary" , Variable := "spe
 TABLES <- TABLES[Variable ==  "inidication_code" , Variable := "indication_code"]
 
 
-
+#Define tables to analyse
 
 if(is.null(t.interest)){
       t.interest <- unique(TABLES[["TABLE"]])
-      t.interest <- t.interest[!t.interest %in% c("METADATA","CDM_SOURCE","INSTANCE")]
+      t.interest <- t.interest[!t.interest %in% c("METADATA","CDM_SOURCE","INSTANCE", "EUROCAT")]
       t.interest <- t.interest[unname((unlist(sapply(t.interest, function(x) any(grepl(x ,list.files(path)), na.rm = T)))))] 
       
 } 

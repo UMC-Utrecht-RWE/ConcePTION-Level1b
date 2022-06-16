@@ -112,11 +112,11 @@ for(j in t.interest){
       rm(VALUES2)
       
     }
-    fwrite(VALUES3,paste0(projectFolder, "/g_output/AWNSERS_",j,".csv"), sep = ";") 
+    fwrite(VALUES3,paste0(projectFolder, "/g_output/",DATE,"_",DAP,"_AWNSERS_",j,".csv"), sep = ";") 
     rm(VALUES3)
     }
       
-    fwrite(as.data.table(VALUES)[, Study_variable := as.character()],paste0(projectFolder, "/g_output/WHERECLAUSE_",j,".csv"), sep = ";")
+    fwrite(as.data.table(VALUES)[, Study_variable := as.character()],paste0(projectFolder, "/g_output/",DATE,"_",DAP,"_WHERECLAUSE_",j,".csv"), sep = ";")
     rm(VALUES, colls)
   }
   
