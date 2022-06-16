@@ -8,10 +8,14 @@
 rm(list=ls())
 gc()
 
-#Fill location of CDM and the table to analyse
-#path <- "Y:/Studies/ConcePTION/B_Documentation/2 Protocol_DSMB_Monitoring/WP 7.6 Data Characterization SAP/tmp_RE/C4591021_PfizerUMC_20220325/CDMInstances/TEST_SAMPLE"
-#path <- "C:/C4591021_PfizerUMC/CDMInstances/RTI_simulated_10000"
-path <- "C:/C4591021_PfizerUMC/CDMInstances/Validate"
+#Fill location of CDM and the table to analyze. There are 2 options. If StudyName is set top NULL a path can be specified. If a studyname is defined the path_to_fill is 
+#replaced by the folder with the StudyName in the folder where the program is located 
+
+StudyName <- "RTI_10000_20220511"
+#StudyName <- NULL
+#path_to_fill <- "C:/C4591021_PfizerUMC/CDMInstances/Validate"
+path_to_fill <- NULL
+
 
 #Choose wich tables you want to analyse or fill NULL to get all tables analysed
 #t.interest <- c("SURVEY_OBSERVATIONS", "SURVEY_ID", "MEDICAL_OBSERVATIONS", "VACCINES")
@@ -26,6 +30,12 @@ if(!require(rstudioapi)){install.packages("rstudioapi")}
 library(rstudioapi)
 
 projectFolder<-dirname(rstudioapi::getSourceEditorContext()$path)
+
+#Set location of CDM tables
+if(!is.null(StudyName)){
+  system.time(source(paste0(projectFolder,"/99_path.R")))
+}else{path <- path_to_fill}
+
 
 #empty g_output folder
 if(length(list.files(paste0(projectFolder,"/g_output"))) > 0)file.remove(paste0(projectFolder,"/g_output/",list.files(paste0(projectFolder,"/g_output"))))
