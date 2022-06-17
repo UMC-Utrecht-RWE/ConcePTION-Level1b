@@ -17,7 +17,7 @@ StudyName <- "RTI_10000_20220511"
 path_to_fill <- NULL
 
 
-#Choose wich tables you want to analyse or fill NULL to get all tables analysed
+#Choose wich tables you want to analyse or fill NULL to get all tables analysed. Eurocat cannot be analysed by this script
 #t.interest <- c("SURVEY_OBSERVATIONS", "SURVEY_ID", "MEDICAL_OBSERVATIONS", "VACCINES")
 t.interest <- NULL
 
@@ -70,9 +70,11 @@ TABLES <- TABLES[Variable ==  "inidication_code" , Variable := "indication_code"
 
 if(is.null(t.interest)){
       t.interest <- unique(TABLES[["TABLE"]])
-      t.interest <- t.interest[!t.interest %in% c("METADATA","CDM_SOURCE","INSTANCE", "EUROCAT")]
+      t.interest <- t.interest[!t.interest %in% c("METADATA","CDM_SOURCE","INSTANCE")]
       t.interest <- t.interest[unname((unlist(sapply(t.interest, function(x) any(grepl(x ,list.files(path)), na.rm = T)))))] 
       
+      #Remove eurocat because invalid and wrong specified column names. Moreover, it is a veru wide table which makes this analyses less usefull.
+      t.interest <- t.interest[!grepl("EUROCAT", t.interest)]
 } 
   
 

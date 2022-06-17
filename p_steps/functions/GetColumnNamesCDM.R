@@ -34,6 +34,9 @@ for(i in sheets){
           rm(TEMP)
 }
 
+
+TABLES <- TABLES[!is.na(Variable) & !is.na(TABLE),]
+
 return(TABLES)
 
 
