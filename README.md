@@ -5,7 +5,7 @@ The aim of this script is to explore which data is stored in the CDM. This can b
 
 1 Open the to_run.R file with Rstudio
 
-2 Fill the variable path with the location of the CDM tables (csv files)
+2 Fill the variable path with the location of the CDM tables (csv files) and set StudyName to NULL, OR fill the variable StudyName with the foldername where the CDM tables are stored in CDMinstances and set path to NULL. 
 
 3 By default the variables t.interest is set to NULL. In that situation all the CDM tables that are found are analysed. You can also specify the variable t.interest    yourself.
 
