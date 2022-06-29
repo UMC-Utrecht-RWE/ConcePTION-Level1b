@@ -15,7 +15,7 @@ The aim of this script is to explore which data is stored in the CDM. This can b
 
 6 Run the whole to_run file
 
-7 Go to g_output and upload the csv file(s)to DRE
+7 Go to g_output and upload the csv file(s)to DRE (see below)
 
 
 # Uploading to anDREa
