@@ -9,7 +9,7 @@ The aim of this script is to explore which data is stored in the CDM. This can b
 
 3. Fill, at the beginning of the to_run file, the variable path_to_fill with the location of the CDM tables (csv files) and set StudyName to NULL (example: row 14: StudyName <- NULL row 17: path_to_fill <- "C:/folder/folderCDMfiles"). Alternatively, you may want to fill the variable StudyName with the foldername where the CDM tables are stored in CDMinstances and set the variable path_to_fill to NULL (example: row 14: StudyName <- "TEST_SAMPLE" row 17: path_to_fill <- NULL).  
 
-4. By default the variable t.interest (at the beginnning of the to_run) is set to NULL. In that situation all the CDM tables that are found are analysed. You can also specify the variable t.interest yourself (example: row 22: t.interest <- c("EVENTS","MEDICAL_OBSERVATIONS")).
+4. By default the variable t.interest (at the beginnning of the to_run) is set to NULL. In that situation all the CDM tables that are found are analysed. You can also specify the variable t.interest yourself (example: row 22: t.interest <- c("EVENTS","MEDICAL_OBSERVATIONS")). Make sure you do only use valid CDM table names. So not EVENTS_BATCH1, but only EVENTS. The program is searching for for all the tables staring with EVENTS.
 
 5. By default the variable  GetCountsColumns (at the beginnning of the to_run at row 25) is set to FALSE. If you set this to TRUE also counts per columns are executed in addition to the unique row count.
 
