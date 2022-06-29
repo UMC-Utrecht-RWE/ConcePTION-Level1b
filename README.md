@@ -16,3 +16,39 @@ The aim of this script is to explore which data is stored in the CDM. This can b
 6 Run the whole to_run file
 
 7 Go to g_output and upload the csv file(s)to DRE
+
+
+# Uploading to anDREa
+
+1.	In a web browser, Go To: mydre.org.
+
+2.	Click on 'Click here to login'. Pick an account and enter password.
+
+3.	Click on Workspaces in upper left and then double click on the project workspace.
+
+4.	Click on Files tab at top.
+
+5.	Double click on 'inbox' folder.
+
+6.	Click on '(DAPNAME/)Level 1 & 2'.
+
+7.	Create a folder by clicking on the folder icon with + on it.
+
+8.	Name the folder with the name of the data source, quality check level number and the date of running/uploading. Example if the data source ARS is uploading the level 1b checks output on the 28 September 2021, the folder should be named: ARS_level1b_2021_09_28.
+
+9.	Click on the folder you created.
+
+10.	Click on cloud icon to upload files.
+
+11.	Click on select and upload.
+
+12.	Open the /g_output/. Hold down control and select all files within your prepared folder.
+
+13.	Click on open.
+
+14.	When it asks to confirm: "Would like to upload the inbox?" select 'OK'.
+
+15.	Note: It may take many minutes for your upload to complete. You should receive an email once they are uploaded.
+
+16.	If you find that your files are not in the corresponding level directory, check if the files are in the inbox and move them to the corresponding level directory.
+
