@@ -75,7 +75,7 @@ if(is.null(t.interest)){
       
       #Remove eurocat because invalid and wrong specified column names. Moreover, it is a veru wide table which makes this analyses less usefull.
       t.interest <- t.interest[!grepl("EUROCAT", t.interest)]
-      t.interest <- t.interest[!grepl("PERSONS", t.interest)]
+      #t.interest <- t.interest[!grepl("PERSONS", t.interest)]
 } 
   
 
