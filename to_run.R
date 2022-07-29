@@ -11,10 +11,10 @@ gc()
 #Fill location of CDM and the table to analyze. There are 2 options. If StudyName is set top NULL a path can be specified. If a StudyName is defined the path_to_fill is 
 #replaced by the folder with the CDMInstances/StudyName in the folder where the program is located 
 
-StudyName <- "RTI_10000_20220511"
-#StudyName <- NULL
-#path_to_fill <- "C:/C4591021_PfizerUMC/CDMInstances/TEST_SAMPLE"
-path_to_fill <- NULL
+#StudyName <- "RTI_10000_20220511"
+StudyName <- NULL
+path_to_fill <- "H:/RTI_SIM_CSV_20k_20220728/"
+#path_to_fill <- NULL
 
 
 #Choose wich tables you want to analyse or fill NULL to get all tables analysed. Eurocat cannot be analysed by this script
@@ -39,11 +39,13 @@ if(!is.null(StudyName)){
 
 #empty g_output folder
 if(length(list.files(paste0(projectFolder,"/g_output"))) > 0)file.remove(paste0(projectFolder,"/g_output/",list.files(paste0(projectFolder,"/g_output"))))
+if(length(list.files(paste0(projectFolder,"/g_intermediate"))) > 0)file.remove(paste0(projectFolder,"/g_intermediate/",list.files(paste0(projectFolder,"/g_intermediate"))))
 
 
 #Load needed functions
 system.time(source(paste0(projectFolder,"/p_steps/functions/IMPORT_PATTERN.R")))
 system.time(source(paste0(projectFolder,"/p_steps/functions/GetColumnNamesCDM.R")))
+system.time(source(paste0(projectFolder,"/p_steps/functions/DetectValues.R")))
 
 #Get needed packages
 system.time(source(paste0(projectFolder,"/packages.R")))
@@ -82,6 +84,7 @@ if(is.null(t.interest)){
 #Run program that is counting all combinations after deleting columns with id and date in it.
 system.time(source(paste0(projectFolder,"/p_steps/GetCounts.R")))
 
+system.time(source(paste0(projectFolder,"/p_steps/DetectValuesInOneColumn.R")))
 
 
 

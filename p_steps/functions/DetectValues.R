@@ -1,12 +1,9 @@
 
 
 
-rm(list=ls())
-gc()
+#data <- fread("C:/ConcePTION-Level1b/g_output/20211231_DSRU_WHERECLAUSE_MEDICAL_OBSERVATIONS.csv")
 
-data <- fread("C:/ConcePTION-Level1b/g_output/20211231_DSRU_WHERECLAUSE_MEDICAL_OBSERVATIONS.csv")
-
-data <- data[, N := as.numeric(gsub("<", "", N_masked))][, N_masked := NULL ]
+#data <- data[, N := as.numeric(gsub("<", "", N_masked))][, N_masked := NULL ]
 
 #file <- data
 #c.N <- "N"
@@ -14,9 +11,12 @@ data <- data[, N := as.numeric(gsub("<", "", N_masked))][, N_masked := NULL ]
 
 DetectValues <- function(file, c.N, cutoff = 30){
 
+  
+file <- copy(file)  
 setnames(file, c.N, "N")
+c.order <- c("N",colnames(file)[!colnames(file) %in% "N"])
 
-file <- copy(file)[, `:=` (sens = as.numeric(),  count = 0, col = as.character(), id = as.numeric())  ]
+file <- file[, `:=` (sens = as.numeric(),  count = 0, col = as.character(), id = as.numeric())  ]
 #file <- file[, `:=`  ( meanN = mean(N)), by = col_tmp]
 
 cols <- colnames(file)
@@ -36,12 +36,14 @@ i <- 1
             
           }
         
-        file2 <- list()
+        
         file1 <- file[count != 1,]
         scheme <- unique(file[count == 1,][, .(col, id)])
         
         rm(cols)
         
+        if(nrow(scheme) > 0){
+          file2 <- list()
           for(i in 1:nrow(scheme)){
           
             
@@ -67,9 +69,12 @@ i <- 1
                 rm(c.col, c.id, tmp)
           
           }
+          file2 <- do.call(rbindlist, list(file2, fill = T, use.names = T))[, N := sum(N), by = "id"]
+          
+        }else{file2 <- file[0]}
         
         rm(scheme, file)
-        file2 <- do.call(rbindlist, list(file2, fill = T, use.names = T))[, N := sum(N), by = "id"]
+        
         
         cols <- colnames(file1)[!colnames(file1) %in% c("Study_variable", "sens", "count", "meanN", "col", "id", "id2")]
         file2 <- unique(file2[, cols, with = F])
@@ -82,14 +87,16 @@ i <- 1
         
         setnames(result , "N", c.N)
         
+        setcolorder(result, c.order)
+        
         return(result)
 
 
 }
 
 
-test <- DetectValues(
-  file = data,
-  c.N = "N"
-  
-  )
+#test <- DetectValues(
+#  file = data,
+#  c.N = "N"
+#  
+#  )

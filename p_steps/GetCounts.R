@@ -74,7 +74,8 @@ for(j in t.interest){
     #Remove id's and dates
     colls <- colls[!grepl("date", colls)]
     colls <- colls[!grepl("_id", colls)]
-    colls <- colls[!colls %in% c("day_of_birth", "month_of_birth","year_of_birth","day_of_death","month_of_death", "year_of_death", "event_code", "medicinal_product_atc_code")]
+    colls <- colls[!colls %in% c("day_of_birth", "month_of_birth","year_of_birth","day_of_death","month_of_death", "year_of_death")]
+    #, "event_code", "medicinal_product_atc_code"
     
     VALUES <- dbGetQuery(mydb,
                          
@@ -89,6 +90,12 @@ for(j in t.interest){
                          
                          
     )
+    
+    
+    #[,  N_masked :=  fifelse(N < 5, "< 5", as.character(N)) ][, N := NULL]
+    saveRDS(as.data.table(VALUES),paste0(projectFolder, "/g_intermediate/WHERECLAUSE_",j,".rds"))
+    rm(VALUES)
+    gc()
     
     if(GetCountsColumns){
     for(i in colls){
@@ -113,13 +120,12 @@ for(j in t.interest){
       
     }
     VALUES3 <- VALUES3[,  N_masked :=  fifelse(N < 5, "< 5", as.character(N)) ][, N := NULL]    
-    fwrite(VALUES3,paste0(projectFolder, "/g_output/",DATE,"_",DAP,"_AWNSERS_",j,".csv"), sep = ";") 
+    saveRDS(VALUES3,paste0(projectFolder, "/g_intermediate/AWNSERS_",j,".rds")) 
     rm(VALUES3)
     }
     
-    VALUES <- as.data.table(VALUES)[,  N_masked :=  fifelse(N < 5, "< 5", as.character(N)) ][, N := NULL]  
-    fwrite(VALUES[, Study_variable := as.character()],paste0(projectFolder, "/g_output/",DATE,"_",DAP,"_WHERECLAUSE_",j,".csv"), sep = ";")
-    rm(VALUES, colls)
+    
+    rm(colls)
   }
   
 }
