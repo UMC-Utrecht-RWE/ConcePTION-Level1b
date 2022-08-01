@@ -13,7 +13,7 @@ gc()
 
 #StudyName <- "RTI_10000_20220511"
 StudyName <- NULL
-path_to_fill <- "H:/RTI_SIM_CSV_20k_20220728/"
+path_to_fill <- "C:/C4591021_PfizerUMC/CDMInstances/TEST_SAMPLE/"
 #path_to_fill <- NULL
 
 
