@@ -37,7 +37,9 @@ DetectValues <- function(file, c.N, cutoff = 30, est.n.cols = T, n.cols = NULL, 
             
             if(est.n.cols){
               count_values <- sapply(colnames(file)[!colnames(file) %in% "N"], function(x){length(unique(file[[x]]))})
-              count_values <- names(count_values[count_values > (nrow(file) / cutoff)])
+              #count_values <- names(count_values[count_values > (nrow(file) / cutoff)])
+              count_values <- names(count_values[count_values > cutoff])
+              
               #sort(count_values, decreasing = T)[1:n.cols]
               cols_excl <- cols[cols %in% count_values]
               n.cols <- length(cols_excl)
@@ -48,6 +50,8 @@ DetectValues <- function(file, c.N, cutoff = 30, est.n.cols = T, n.cols = NULL, 
             
             #Create the list with all combinations to exclude based on a number of columns to exclude (n.col)
             ###
+            if(n.cols > 0){
+            
             cols2 <-  list()
             cols2 <-  lapply(1:n.cols, function(x) cols2[[x]] <- cols_excl )
             cols2 <- do.call(expand.grid, c(list(cols2), stringsAsFactors = F))
@@ -69,81 +73,88 @@ DetectValues <- function(file, c.N, cutoff = 30, est.n.cols = T, n.cols = NULL, 
             for(i in 1:length(cols2)){
             
             
-            col_tmp <- cols[!cols %in% c(cols2[[i]], cols_exclude)]
-            
-            idfile <- unique(file[, col_tmp, with = F])[, idtmp := as.numeric(paste0(i, seq_len(.N)))] 
-            file <- merge(file, idfile, by = col_tmp, all.x = T) 
-            
-            file <- file[, `:=`  (sens = .N), by = col_tmp]
-            file <- file[sens > cutoff & sens > sens.keep, `:=` (count = count + 1, sens.keep = sens, col = paste0(cols2[[i]], collapse = "|"), id = idtmp)][, idtmp := NULL]
-            
-            rm(col_tmp, idfile)
-            
-          }
-        
-        
-        file1 <- file[count == 0,]
-        scheme <- unique(file[count > 0,][, .(col, id)])
-        
-        rm(cols)
-        
-        if(nrow(scheme) > 0){
-          file2 <- list()
-          for(i in 1:nrow(scheme)){
-          
-            
-                c.col <- scheme[i,][["col"]]
-                c.id <- scheme[i,][["id"]]
+              col_tmp <- cols[!cols %in% c(cols2[[i]], cols_exclude)]
               
-                tmp <- copy(file)[id == c.id & col == c.col & count == 1,]
-                
-                #cols <- colnames(file)[!colnames(file) %in% c(c.col , "Study_variable", "sens", "count", "meanN", "col")]
-                #tmp <- tmp[, id2 := paste0(nchar(do.call(paste0, .SD)), id), .SDcols = cols]
-                
-                for(j in unlist(strsplit(c.col, "\\|"))){
-                
-                check <- suppressWarnings(sum(is.na(as.numeric(tmp[[j]]))))
-                
-                if(check == 0) tmp <- tmp[, eval(j) := NULL][, eval(j) := "NUM"] 
-                if(check == length(tmp[[j]])) tmp <- tmp[, eval(j) := NULL][, eval(j) := "CHAR"] 
-                if(check > 0 & check < length(tmp[[j]])) tmp <- tmp[, eval(j) := NULL][, eval(j) := "CHAR/NUM"]
-                rm(check)
-                }
-                
-                
-                file2[[i]] <- tmp
-                
-                rm(c.col, c.id, tmp)
+              idfile <- unique(file[, col_tmp, with = F])[, idtmp := as.numeric(paste0(i, seq_len(.N)))] 
+              file <- merge(file, idfile, by = col_tmp, all.x = T) 
+              
+              file <- file[, `:=`  (sens = .N), by = col_tmp]
+              file <- file[sens > cutoff & sens > sens.keep, `:=` (count = count + 1, sens.keep = sens, col = paste0(cols2[[i]], collapse = "|"), id = idtmp)][, idtmp := NULL]
+              
+              rm(col_tmp, idfile)
+            
+            }
+        
+        
+          file1 <- file[count == 0,]
+          scheme <- unique(file[count > 0,][, .(col, id)])
           
-          }
-          file2 <- do.call(rbindlist, list(file2, fill = T, use.names = T))[, N := sum(N), by = "id"]
+          rm(cols)
           
-        }else{file2 <- file[0]}
-        
-        rm(scheme, file)
-        
-        
-        cols <- colnames(file1)[!colnames(file1) %in% c("Study_variable", "sens", "sens.keep",  "count", "meanN", "col", "id", "id2")]
-        file2 <- unique(file2[, cols, with = F])
-        
-        
-        
-        file1 <- unique(file1[, cols, with = F])
-        
-        result <- rbindlist(list(file1, file2), fill = T, use.names = T)
-        
-        setnames(result , "N", c.N)
-        
-        setcolorder(result, c.order)
-        
-        return(result)
-
+          if(nrow(scheme) > 0){
+            file2 <- list()
+            for(i in 1:nrow(scheme)){
+            
+              
+                  c.col <- scheme[i,][["col"]]
+                  c.id <- scheme[i,][["id"]]
+                
+                  tmp <- copy(file)[id == c.id & col == c.col & count == 1,]
+                  
+                  #cols <- colnames(file)[!colnames(file) %in% c(c.col , "Study_variable", "sens", "count", "meanN", "col")]
+                  #tmp <- tmp[, id2 := paste0(nchar(do.call(paste0, .SD)), id), .SDcols = cols]
+                  
+                  for(j in unlist(strsplit(c.col, "\\|"))){
+                  
+                  check <- suppressWarnings(sum(is.na(as.numeric(tmp[[j]]))))
+                  
+                  if(check == 0) tmp <- tmp[, eval(j) := NULL][, eval(j) := "NUM"] 
+                  if(check == length(tmp[[j]])) tmp <- tmp[, eval(j) := NULL][, eval(j) := "CHAR"] 
+                  if(check > 0 & check < length(tmp[[j]])) tmp <- tmp[, eval(j) := NULL][, eval(j) := "CHAR/NUM"]
+                  rm(check)
+                  }
+                  
+                  
+                  file2[[i]] <- tmp
+                  
+                  rm(c.col, c.id, tmp)
+            
+            }
+            file2 <- do.call(rbindlist, list(file2, fill = T, use.names = T))[, N := sum(N), by = "id"]
+            
+          }else{file2 <- file[0]}
+          
+          rm(scheme, file)
+          
+          
+          cols <- colnames(file1)[!colnames(file1) %in% c("Study_variable", "sens", "sens.keep",  "count", "meanN", "col", "id", "id2")]
+          file2 <- unique(file2[, cols, with = F])
+          
+          
+          file1 <- unique(file1[, cols, with = F])
+          
+          result <- rbindlist(list(file1, file2), fill = T, use.names = T)
+          
+          setnames(result , "N", c.N)
+          
+          setcolorder(result, c.order)
+          
+          return(result)
+            }else{
+              setnames(file , "N", c.N)
+              file <- file[,c.order , with = F]
+              setcolorder(file, c.order)
+              return(file)}
 
 }
 
 
 #test <- DetectValues(
 #  file = data,
-#  c.N = "N"
-#  
+#  c.N = "N", 
+#  cutoff = 30,
+#  est.n.cols = T, 
+#  n.cols = NULL, 
+#  n.cols.only = F 
+  
 #  )

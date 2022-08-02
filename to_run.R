@@ -13,7 +13,8 @@ gc()
 
 #StudyName <- "RTI_10000_20220511"
 StudyName <- NULL
-path_to_fill <- "C:/C4591021_PfizerUMC/CDMInstances/TEST_SAMPLE/"
+#path_to_fill <- "C:/C4591021_PfizerUMC/CDMInstances/TEST_SAMPLE/"
+path_to_fill <- "H:/RTI_SIM_CSV_20k_20220728/"
 #path_to_fill <- NULL
 
 
@@ -45,7 +46,7 @@ if(length(list.files(paste0(projectFolder,"/g_intermediate"))) > 0)file.remove(p
 #Load needed functions
 system.time(source(paste0(projectFolder,"/p_steps/functions/IMPORT_PATTERN.R")))
 system.time(source(paste0(projectFolder,"/p_steps/functions/GetColumnNamesCDM.R")))
-system.time(source(paste0(projectFolder,"/p_steps/functions/DetectValues.R")))
+system.time(source(paste0(projectFolder,"/p_steps/functions/DetectValues_test_multiple_cols.R")))
 
 #Get needed packages
 system.time(source(paste0(projectFolder,"/packages.R")))
@@ -82,6 +83,8 @@ if(is.null(t.interest)){
   
 
 #Run program that is counting all combinations after deleting columns with id and date in it.
+
+setwd("H:/testtemp/")
 system.time(source(paste0(projectFolder,"/p_steps/GetCounts.R")))
 
 system.time(source(paste0(projectFolder,"/p_steps/DetectValuesInOneColumn.R")))

@@ -74,7 +74,8 @@ for(j in t.interest){
     #Remove id's and dates
     colls <- colls[!grepl("date", colls)]
     colls <- colls[!grepl("_id", colls)]
-    colls <- colls[!colls %in% c("day_of_birth", "month_of_birth","year_of_birth","day_of_death","month_of_death", "year_of_death")]
+    colls <- colls[!grepl("atc_code", colls)]
+    colls <- colls[!colls %in% c("day_of_birth", "month_of_birth","year_of_birth","day_of_death","month_of_death", "year_of_death", "event_code")]
     #, "event_code", "medicinal_product_atc_code"
     
     VALUES <- dbGetQuery(mydb,
