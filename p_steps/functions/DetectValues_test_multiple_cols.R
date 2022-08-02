@@ -11,25 +11,40 @@ cutoff <- 10
 
 #DetectValues <- function(file, c.N, cutoff = 30){
 
-  
-file <- copy(file)  
+#Copt data.table object so it does not change outside the function  
+file <- copy(file)
+
+#Remove empty columns
+file <- file[, colnames(file)[(colSums(is.na(file)) != nrow(file))], with = F]
+
+#Standardize table properties/columns
 setnames(file, c.N, "N")
 c.order <- c("N",colnames(file)[!colnames(file) %in% "N"])
 
-file <- file[, `:=` (sens = as.numeric(), sens.keep = 0,  count = 0, col = as.character(), id = as.numeric())  ]
+#Create columns for needed for looping over columns
+file <- file[, `:=` (sens = as.numeric(), sens.keep = 0, count = 0, col = as.character(), id = as.numeric())  ]
 #file <- file[, `:=`  ( meanN = mean(N)), by = col_tmp]
 
-cols <- colnames(file)[!colnames(file)  %in% c("N", "Study_variable", "sens", "sens.keep", "count", "meanN", "col", "id")]
-cols2 <-  as.data.table(expand.grid(cols, cols, stringsAsFactors = F))
+#Determine columns to analyse by exclusion
+cols_exclude <- c("N", "Study_variable", "sens", "sens.keep", "count", "meanN", "col", "id")
+cols <- colnames(file)[!colnames(file)  %in% cols_exclude]
+#cols2 <-  as.data.table(expand.grid(cols, cols, stringsAsFactors = F))
 #[Var1 != Var2,]
 
-cols2 <- cols2[, Var3 :=  fifelse(Var1 == Var2, 1, 2)]
-setorder(cols2, Var3)[, Var3 := NULL]
-cols2t <- split(as.data.frame(cols2), c(1:nrow(cols2)))
+ncols <- length(cols)-1
+cols2 <-  list()
+cols2 <-  lapply(1:ncols, function(x) cols2[[x]] <- cols )
+cols2 <- do.call(expand.grid, c(list(cols2), stringsAsFactors = F))
+
+#cols2 <- cols2[, Var3 :=  fifelse(Var1 == Var2, 1, 2)]
+#setorder(cols2, Var3)[, Var3 := NULL]
+#cols2t <- split(as.data.frame(cols2), c(1:nrow(cols2)))
 
 #t <- (cols2t[2])
 cols2 <- as.list(as.data.frame(t(cols2)))
-
+cols2 <- unique(lapply(cols2, sort))
+cols2 <- lapply(cols2, unique)
+cols2 <- cols2[which(lapply(cols2, length) == ncols)]
 
 
 #col_tmp <- paste0(unname(cols[[1]]), collapse = "|")
@@ -37,7 +52,7 @@ i <- 7
           for(i in 1:length(cols2)){
             
             
-            col_tmp <- cols[!cols %in% c(cols2[[i]], "N", "Study_variable", "sens", "sens.keep", "count", "meanN", "col", "id")]
+            col_tmp <- cols[!cols %in% c(cols2[[i]], cols_exclude)]
             
             idfile <- unique(file[, col_tmp, with = F])[, idtmp := as.numeric(paste0(i, seq_len(.N)))] 
             file <- merge(file, idfile, by = col_tmp, all.x = T) 
