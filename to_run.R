@@ -84,7 +84,8 @@ if(is.null(t.interest)){
 
 #Run program that is counting all combinations after deleting columns with id and date in it.
 
-setwd("H:/testtemp/")
+##???How to solve the disk problem
+#setwd("H:/testtemp/")
 system.time(source(paste0(projectFolder,"/p_steps/GetCounts.R")))
 
 system.time(source(paste0(projectFolder,"/p_steps/DetectValuesInOneColumn.R")))
