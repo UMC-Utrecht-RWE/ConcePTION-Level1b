@@ -8,6 +8,7 @@ data <- readRDS("C:/ConcePTION-Level1b/g_intermediate/WHERECLAUSE_VACCINES.rds")
 file <- data
 c.N <- "N"
 cutoff <- 10
+n.cols <- 2 
 
 #DetectValues <- function(file, c.N, cutoff = 30){
 
@@ -31,9 +32,9 @@ cols <- colnames(file)[!colnames(file)  %in% cols_exclude]
 #cols2 <-  as.data.table(expand.grid(cols, cols, stringsAsFactors = F))
 #[Var1 != Var2,]
 
-ncols <- length(cols)-1
+
 cols2 <-  list()
-cols2 <-  lapply(1:ncols, function(x) cols2[[x]] <- cols )
+cols2 <-  lapply(1:n.cols, function(x) cols2[[x]] <- cols )
 cols2 <- do.call(expand.grid, c(list(cols2), stringsAsFactors = F))
 
 #cols2 <- cols2[, Var3 :=  fifelse(Var1 == Var2, 1, 2)]
@@ -44,7 +45,7 @@ cols2 <- do.call(expand.grid, c(list(cols2), stringsAsFactors = F))
 cols2 <- as.list(as.data.frame(t(cols2)))
 cols2 <- unique(lapply(cols2, sort))
 cols2 <- lapply(cols2, unique)
-cols2 <- cols2[which(lapply(cols2, length) == ncols)]
+cols2 <- cols2[which(lapply(cols2, length) == n.cols)]
 
 
 #col_tmp <- paste0(unname(cols[[1]]), collapse = "|")
