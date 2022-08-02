@@ -1,56 +1,72 @@
 
 
 
-data <- readRDS("C:/ConcePTION-Level1b/g_intermediate/WHERECLAUSE_VACCINES.rds")
+#data <- readRDS("C:/ConcePTION-Level1b/g_intermediate/WHERECLAUSE_VACCINES.rds")
 
 #data <- data[, N := as.numeric(gsub("<", "", N_masked))][, N_masked := NULL ]
 
-file <- data
-c.N <- "N"
-cutoff <- 10
-n.cols <- 2 
-
-#DetectValues <- function(file, c.N, cutoff = 30){
-
-#Copt data.table object so it does not change outside the function  
-file <- copy(file)
-
-#Remove empty columns
-file <- file[, colnames(file)[(colSums(is.na(file)) != nrow(file))], with = F]
-
-#Standardize table properties/columns
-setnames(file, c.N, "N")
-c.order <- c("N",colnames(file)[!colnames(file) %in% "N"])
-
-#Create columns for needed for looping over columns
-file <- file[, `:=` (sens = as.numeric(), sens.keep = 0, count = 0, col = as.character(), id = as.numeric())  ]
-#file <- file[, `:=`  ( meanN = mean(N)), by = col_tmp]
-
-#Determine columns to analyse by exclusion
-cols_exclude <- c("N", "Study_variable", "sens", "sens.keep", "count", "meanN", "col", "id")
-cols <- colnames(file)[!colnames(file)  %in% cols_exclude]
-#cols2 <-  as.data.table(expand.grid(cols, cols, stringsAsFactors = F))
-#[Var1 != Var2,]
+#file <- data
+#c.N <- "N"
+#cutoff <- 30
+#est.n.cols <- T
+#n.cols <- 2
+#n.cols.only <- F
 
 
-cols2 <-  list()
-cols2 <-  lapply(1:n.cols, function(x) cols2[[x]] <- cols )
-cols2 <- do.call(expand.grid, c(list(cols2), stringsAsFactors = F))
 
-#cols2 <- cols2[, Var3 :=  fifelse(Var1 == Var2, 1, 2)]
-#setorder(cols2, Var3)[, Var3 := NULL]
-#cols2t <- split(as.data.frame(cols2), c(1:nrow(cols2)))
+DetectValues <- function(file, c.N, cutoff = 30, est.n.cols = T, n.cols = NULL, n.cols.only = F  ){
 
-#t <- (cols2t[2])
-cols2 <- as.list(as.data.frame(t(cols2)))
-cols2 <- unique(lapply(cols2, sort))
-cols2 <- lapply(cols2, unique)
-cols2 <- cols2[which(lapply(cols2, length) == n.cols)]
+            #Copy data.table object so it does not change outside the function  
+            file <- copy(file)
+            
+            #Remove empty columns
+            file <- file[, colnames(file)[(colSums(is.na(file)) != nrow(file))], with = F]
+            
+            #Standardize table properties/columns
+            setnames(file, c.N, "N")
+            c.order <- c("N",colnames(file)[!colnames(file) %in% "N"])
+            
+            #Create columns for needed for looping over columns
+            file <- file[, `:=` (sens = as.numeric(), sens.keep = 0, count = 0, col = as.character(), id = as.numeric())  ]
+            #file <- file[, `:=`  ( meanN = mean(N)), by = col_tmp]
+            
+            #Determine columns to analyse by exclusion
+            ###
+            cols_exclude <- c("N", "Study_variable", "sens", "sens.keep", "count", "meanN", "col", "id")
+            cols <- colnames(file)[!colnames(file)  %in% cols_exclude]
+            
+            if(est.n.cols){
+              count_values <- sapply(colnames(file)[!colnames(file) %in% "N"], function(x){length(unique(file[[x]]))})
+              count_values <- names(count_values[count_values > (nrow(file) / cutoff)])
+              #sort(count_values, decreasing = T)[1:n.cols]
+              cols_excl <- cols[cols %in% count_values]
+              n.cols <- length(cols_excl)
+            }else{cols_excl <- cols}
+            
+            ###
+            #[Var1 != Var2,]
+            
+            #Create the list with all combinations to exclude based on a number of columns to exclude (n.col)
+            ###
+            cols2 <-  list()
+            cols2 <-  lapply(1:n.cols, function(x) cols2[[x]] <- cols_excl )
+            cols2 <- do.call(expand.grid, c(list(cols2), stringsAsFactors = F))
+            
+            #cols2 <- cols2[, Var3 :=  fifelse(Var1 == Var2, 1, 2)]
+            #setorder(cols2, Var3)[, Var3 := NULL]
+            #cols2t <- split(as.data.frame(cols2), c(1:nrow(cols2)))
+            
+            #t <- (cols2t[2])
+            cols2 <- as.list(as.data.frame(t(cols2)))
+            cols2 <- unique(lapply(cols2, sort))
+            cols2 <- lapply(cols2, unique)
+            if(n.cols.only) cols2 <- cols2[which(lapply(cols2, length) == n.cols)]
+            
+            ###
 
 
-#col_tmp <- paste0(unname(cols[[1]]), collapse = "|")
-i <- 7
-          for(i in 1:length(cols2)){
+#i <- 7
+            for(i in 1:length(cols2)){
             
             
             col_tmp <- cols[!cols %in% c(cols2[[i]], cols_exclude)]
@@ -61,7 +77,6 @@ i <- 7
             file <- file[, `:=`  (sens = .N), by = col_tmp]
             file <- file[sens > cutoff & sens > sens.keep, `:=` (count = count + 1, sens.keep = sens, col = paste0(cols2[[i]], collapse = "|"), id = idtmp)][, idtmp := NULL]
             
-            #if(!any(file[["count"]] < 2)) break
             rm(col_tmp, idfile)
             
           }
@@ -124,7 +139,7 @@ i <- 7
         return(result)
 
 
-#}
+}
 
 
 #test <- DetectValues(
