@@ -39,7 +39,8 @@ codesheet[,code_no_dot := gsub("\\.","",codesheet[,Code])]
 
 codesheet[,start_with := fifelse(substr(Code,nchar(Code),nchar(Code) + 1) == "." | Type %in% c.startwith ,"T","F")]
 
- 
+report_missing <- list()
+report_available <- list()
 
 files <- list.files(paste0(projectFolder,"/g_intermediate/"), include.dirs = T, all.files = T, full.names = T, recursive = T)
 
@@ -57,7 +58,7 @@ file <- files[grepl(paste0("WHERECLAUSE_", TABLE), files)]
         DATA_FILE <- dbGetQuery(mydb, paste0("SELECT DISTINCT ",f.code,",", f.voc," FROM ", TABLE))
         
         dbWriteTable(tmpdb, "TEMP" ,DATA_FILE , overwrite = T, append = F) 
-        dbGetQuery(tmpdb, "SELECT * FROM TEMP")
+        #dbGetQuery(tmpdb, "SELECT * FROM TEMP")
         p <- dbSendStatement(tmpdb, paste0("CREATE TABLE TEMP2 AS SELECT DISTINCT ",f.voc," AS Type2, REPLACE( ",f.code,", '.', '' ) as code_no_dot2 FROM TEMP"))
         dbClearResult(p)
         
@@ -75,11 +76,11 @@ file <- files[grepl(paste0("WHERECLAUSE_", TABLE), files)]
         #t1.code_no_dot2 LIKE(t2.code_no_dot || '%')
         ###
         
-        aatest <- dbGetQuery(tmpdb, "SELECT DISTINCT * FROM TEMP2")
+        #aatest <- dbGetQuery(tmpdb, "SELECT DISTINCT * FROM TEMP2")
         #EXPLAIN QUERY PLAN
-        system.time(TEMP14 <- dbGetQuery(tmpdb,"
+        system.time(TEMP1 <- dbGetQuery(tmpdb,"
                   
-                  EXPLAIN QUERY PLAN
+                  
                   SELECT DISTINCT  t1.Type2 , t2.Concept
                   FROM (SELECT DISTINCT * FROM TEMP2) t1
                   INNER JOIN codesheet t2
@@ -119,27 +120,32 @@ file <- files[grepl(paste0("WHERECLAUSE_", TABLE), files)]
         
         
         missing <- unique(codesheet$Concept)[!unique(codesheet$Concept) %in% unique(TEMP1$Concept)]
-        file <- rep(i, length(missing))
+        available <- unique(codesheet$Concept)[unique(codesheet$Concept) %in% unique(TEMP1$Concept)]
+        file <- rep(TABLE, length(missing))
         voc <- rep(voc, length(missing))
         
-        report[[i]] <- as.data.table(cbind(file, missing, voc))
         
+        report_missing[[i]] <- as.data.table(cbind(file, missing, voc))
+        
+        
+        report_available <- unique(TEMP1)[, Table := TABLE]
+        setnames(available, "Type2", "Coding_system")
         
         dbDisconnect(mydb)
         
         rm(DATA_FILE, missing, file, voc, p, mydb)
         gc()
 
-}
 
 
-report <-  do.call(rbind, report)
 
+        report_available <-  do.call(rbind, report_available)
+        report_missing <-  do.call(rbind, report_missing)
 
 rm(c.voc, c.concept, c.codes, f.code, f.voc, c.startwith )
 
 
 
-fwrite(report, paste0(path,TABLE,"_Available_concepts.csv"))
-
+fwrite(report_available, paste0(path,"Available_concepts.csv"))
+fwrite(report_missing, paste0(path,"Missing_concepts.csv"))
 
